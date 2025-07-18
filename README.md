@@ -21,17 +21,17 @@
 
 ## 🏗️ Architecture Overview
 
-```
-┌─────────────┐   ┌──────────────┐   ┌─────────────┐   ┌─────────┐
-│  File/URL   │→ │ Data Loader  │→ │ Chunk & Embed│→ │ Vector DB│
-└─────────────┘   └──────────────┘   └─────────────┘   └─────────┘
-      ↓                                               ↑
-┌────────────┐  ←───── Retrieval & Prompt ──────→  ┌──────────┐
-│   User Q   │                                  │   LLM      │
-└────────────┘                                  └──────────┘
-      ↓                                               ↑
-                      └─── Chatbot UI ────→
-```
+RAGBot combines modern NLP and retrieval in a streamlined pipeline:
+
+1. **User uploads a file or URL via chat UI.**
+2. **Content is loaded and split into chunks.**
+3. **Chunks are embedded into vectors (multilingual-e5-small).**
+4. **Vectors are stored in Chroma DB for semantic search.**
+5. **When a question is asked, relevant chunks are retrieved.**
+6. **A prompt is built with context and query, sent to the LLM (DeepSeek R1 Distill Qwen).**
+7. **Answer is returned in the Gradio chat interface.**
+
+Simple. Powerful. Document-grounded conversations.
 
 ---
 
