@@ -1,3 +1,4 @@
+#pip install langchain faiss-cpu huggingface_hub gradio pypdf transformers bitsandbytes sentence_transformers accelerate faiss-cpu unstructured python-docx langchain-community
 import os
 if os.environ["HUGGINGFACEHUB_API_TOKEN"]:
     print("Huggingface token is set")
@@ -54,7 +55,6 @@ from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 
 def chatbot(file, query):
-    # Correctly wrap the HF pipeline
     hf_pipe = pipeline(
         task="text-generation",
         model="deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
@@ -62,10 +62,10 @@ def chatbot(file, query):
         do_sample=False,
         device_map='auto',
         max_new_tokens=200,
-        return_full_text=False,  # Optional, cleaner output
+        return_full_text=False,  
     )
 
-    # Now wrap the pipeline correctly for LangChain
+
     llm = HuggingFacePipeline(pipeline=hf_pipe)
 
     prompt = PromptTemplate(
@@ -79,10 +79,8 @@ Question: {question}
 Answer:"""
     )
 
-    # Your retriever logic
+    
     retriever_obj = retriver(file)
-
-    # Proper LLM object passed here
     qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever_obj, chain_type_kwargs={"prompt": prompt})
 
     response = qa.run(query)
@@ -101,7 +99,7 @@ def chat_interface(user_message, chat_history, uploaded_file):
 
     chat_history = chat_history or []
     chat_history.append((user_message, bot_reply))
-    return chat_history, chat_history, ""  # Third return clears the textbox
+    return chat_history, chat_history, ""  
 
 with gr.Blocks() as demo:
     uploaded_file = gr.File(label="Upload your file")
@@ -118,7 +116,7 @@ with gr.Blocks() as demo:
     user_input.submit(
         chat_interface,
         inputs=[user_input, chatbot_ui, uploaded_file],
-        outputs=[chatbot_ui, chatbot_ui, user_input]  # Clear textbox here
+        outputs=[chatbot_ui, chatbot_ui, user_input]
     )
 demo.launch(debug=True)
 
