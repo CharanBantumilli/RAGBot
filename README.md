@@ -4,7 +4,7 @@
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 - **Plug & Play Document Ingestion**  
   Effortlessly upload PDFs, TXT, CSV, or web URLs; RAGBot handles them all via modular loaders.
@@ -19,7 +19,7 @@
 
 ---
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 RAGBot combines modern NLP and retrieval in a streamlined pipeline:
 
@@ -35,7 +35,7 @@ Simple. Powerful. Document-grounded conversations.
 
 ---
 
-## 🚀 Quickstart
+## Quickstart
 
 ### **1. Installation**
 
@@ -57,7 +57,7 @@ Open the Gradio interface and start your document-grounded chat!
 
 ---
 
-## 🧩 Usage
+## Usage
 
 - **Upload your data**: Accepts `.pdf`, `.txt`, `.csv`, or URLs.
 - **Ask questions**: Type queries—RAGBot retrieves context and generates concise, relevant answers.
@@ -65,7 +65,7 @@ Open the Gradio interface and start your document-grounded chat!
 
 ---
 
-## 🛠️ Core Modules
+## Core Modules
 
 - `data_loader(file)`: Loads and parses multiple file types.
 - `data_splitter(data)`: Chunks documents for optimal embedding.
@@ -84,14 +84,6 @@ Gradio powers a simple, elegant chat experience:
 - Get instant, context-aware answers!
 
 ---
-
-## 📂 File Structure
-
-```
-RAGBot/
-├── Main.py
-└── requirements.txt
-```
 
 <p align="center">
   <b>RAGBot &mdash; Where your documents meet intelligent conversation.</b>
