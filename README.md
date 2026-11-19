@@ -1,4 +1,4 @@
-# 🤖 RAGBot: Production-Grade Document-Grounded Conversational AI
+# RAGBot: Production-Grade Document-Grounded Conversational AI
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -8,7 +8,7 @@
 [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Tests: Pytest](https://img.shields.io/badge/tests-44%20passed-brightgreen.svg)](tests/)
 
-**RAGBot** is an enterprise-ready, modular Retrieval-Augmented Generation (RAG) system engineered to deliver strictly grounded, accurate conversational answers from private documents. Built using Python, modern LangChain, ChromaDB, Hugging Face transformers, and Gradio, it incorporates software engineering best practices: decoupled modular architecture, lazy resource loading, comprehensive error hierarchies, 100% test coverage, and strict type safety.
+Retrieval Augmented Generation (RAG) system engineered to deliver strictly grounded, accurate conversational answers from private documents. Built using Python, modern LangChain, ChromaDB, Hugging Face transformers, and Gradio, it incorporates software engineering best practices: decoupled modular architecture, lazy resource loading, comprehensive error hierarchies, 100% test coverage, and strict type safety.
 
 ---
 
