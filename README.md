@@ -1,230 +1,132 @@
-# RAGBot: Production-Grade Document-Grounded Conversational AI
+# RAGBot
 
+[![CI](https://github.com/CharanBantumilli/RAGBot/actions/workflows/ci.yml/badge.svg)](https://github.com/CharanBantumilli/RAGBot/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Framework: LangChain](https://img.shields.io/badge/Framework-LangChain%200.3-green.svg)](https://python.langchain.com/)
-[![Vector Store: ChromaDB](https://img.shields.io/badge/Vector%20DB-Chroma-purple.svg)](https://www.trychroma.com/)
-[![LLM: DeepSeek R1 Distill](https://img.shields.io/badge/LLM-DeepSeek%20R1%20Distill-orange.svg)](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B)
-[![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
-[![Tests: Pytest](https://img.shields.io/badge/tests-44%20passed-brightgreen.svg)](tests/)
 
-Retrieval Augmented Generation (RAG) system engineered to deliver strictly grounded, accurate conversational answers from private documents. Built using Python, modern LangChain, ChromaDB, Hugging Face transformers, and Gradio, it incorporates software engineering best practices: decoupled modular architecture, lazy resource loading, comprehensive error hierarchies, 100% test coverage, and strict type safety.
+RAGBot is a document-grounded conversational AI application built with Python, LangChain, ChromaDB, Hugging Face models, and Gradio. Upload a PDF, text, CSV, DOCX, or web content, then ask questions that are answered using retrieved document context.
 
----
+> RAGBot reduces unsupported answers by using retrieval context and an explicit instruction to respond only from available evidence.
 
-## 🏛️ System Architecture
+## Features
 
-The pipeline decouples ingestion, text chunking, embedding generation, vector indexing, and generative inference:
+- PDF, TXT, CSV, DOCX, and web-page ingestion
+- Recursive text chunking and overlap
+- Persistent or in-memory ChromaDB vector storage
+- Hugging Face embedding and generation models
+- Document-grounded prompt guardrails
+- Lazy model loading and prompt caching
+- Interactive Gradio chat interface
+- Pytest, Ruff, and CI configuration
+
+## How it works
 
 ```mermaid
-flowchart TD
-    subgraph UI ["User Interface (Gradio)"]
-        User(["👤 User"])
-        WebUI["Web Chat Interface\n(Soft Theme, State-Aware)"]
-    end
-
-    subgraph Ingestion ["Ingestion & Preprocessing Engine"]
-        DocLoader["DocumentLoader\n(PDF, TXT, CSV, DOCX, Web URL)"]
-        Splitter["TextProcessor\n(RecursiveCharacterTextSplitter)"]
-    end
-
-    subgraph Storage ["Vector Database (ChromaDB)"]
-        Embedder["Embedding Engine\n(intfloat/multilingual-e5-small)"]
-        ChromaStore[("Chroma Vector Store\n(Cosine Similarity Index)")]
-    end
-
-    subgraph Inference ["Inference & Generation Engine"]
-        Retriever["Retriever\n(Top-k Semantic Retrieval)"]
-        PromptEngine["Grounded Prompt Engine\n(Strict Anti-Hallucination Guardrails)"]
-        LLM["LLM Pipeline (Cached)\n(DeepSeek-R1-Distill-Qwen-1.5B)"]
-    end
-
-    User -->|"Uploads document"| WebUI
-    WebUI --> DocLoader
-    DocLoader --> Splitter
-    Splitter --> Embedder
-    Embedder --> ChromaStore
-
-    User -->|"Submits prompt"| WebUI
-    WebUI --> Retriever
-    ChromaStore -.->|"Fetches top-k context"| Retriever
-    Retriever --> PromptEngine
-    PromptEngine --> LLM
-    LLM -->|"Streams validated response"| WebUI
+flowchart LR
+    A[Document or Web URL] --> B[Document Loader]
+    B --> C[Text Chunking]
+    C --> D[Embedding Model]
+    D --> E[(ChromaDB)]
+    F[User Question] --> G[Semantic Retrieval]
+    E --> G
+    G --> H[Grounded Prompt]
+    H --> I[Hugging Face LLM]
+    I --> J[Answer]
 ```
 
----
+## Requirements
 
-## ⚡ Engineering Highlights & Key Features
+- Python 3.10 or newer
+- Pip or an equivalent Python package manager
+- A Hugging Face access token
+- Optional: NVIDIA GPU or Apple Silicon for accelerated inference
 
-- **🚀 Lazy Resource Allocation:** Embedding models and 1.5B LLM pipelines are loaded on demand and cached in memory. Zero initialization overhead on imports.
-- **🛡️ Anti-Hallucination System Prompting:** Enforces strict boundary context answering; gracefully refuses out-of-domain queries rather than fabricating information.
-- **🔄 Smart Ingestion Caching:** Tracks document hash/paths to eliminate redundant chunking and vector recalculation across repetitive user prompts.
-- **📂 Multi-Format Ingestion:** Robust format normalization for PDF, TXT, CSV, DOCX, and live HTTP(S) web scraping with validation guards.
-- **🏗️ Enterprise Design Patterns:** Singleton configuration with environment cascading (`.env` → `RAGBOT_*` overrides), dependency injection, and custom exception hierarchy (`RAGBotError`).
-- **🧪 Production-Ready Test Suite:** 44 comprehensive unit and integration tests with pytest covering edge cases, invalid inputs, and error propagation.
-
----
-
-## 🛠️ Tech Stack Matrix
-
-| Layer | Technology | Purpose |
-|---|---|---|
-| **Language** | Python 3.10+ | Core runtime with modern union types & dataclasses |
-| **Orchestration** | LangChain Core / Community | RAG retrieval chains and document flow pipelines |
-| **Vector DB** | ChromaDB | In-memory & persistent similarity search |
-| **Embeddings** | `intfloat/multilingual-e5-small` | High-accuracy multilingual dense vector embeddings |
-| **Generator LLM** | `DeepSeek-R1-Distill-Qwen-1.5B` | Reasoning-focused distilled compact causal LLM |
-| **Frontend UI** | Gradio 5+ | Responsive, theme-aware conversational interface |
-| **Configuration** | `python-dotenv` + `dataclasses` | Type-checked singleton settings with env overrides |
-| **Testing & Quality** | `pytest`, `ruff`, `mypy` | Strict static typing, linting, and automated unit testing |
-
----
-
-## 📁 Repository Structure
-
-```
-RAGBot/
-├── .env.example              # Template configuration environment variables
-├── .gitignore                # Comprehensive Python, IDE, and model cache rules
-├── LICENSE                   # MIT License
-├── Makefile                  # Automated commands: install, test, lint, format
-├── pyproject.toml            # PEP 517/621 package metadata & dev configurations
-├── requirements.txt          # Clean, pinned production dependency specifications
-├── ragbot/                   # Core Python application package
-│   ├── __init__.py           # Package version and export definitions
-│   ├── __main__.py           # CLI entry point: python -m ragbot
-│   ├── config.py             # Singleton settings & dynamic env loader
-│   ├── document_loader.py    # Multi-format ingestion with URL & path validation
-│   ├── exceptions.py         # Domain-specific exception hierarchy
-│   ├── llm.py                # Cached HuggingFace transformer pipeline manager
-│   ├── rag_chain.py          # End-to-end RAG workflow orchestration
-│   ├── text_processor.py     # Recursive character text splitting
-│   ├── ui.py                 # Gradio reactive web interface
-│   └── vector_store.py       # Chroma vector store with lazy embedding initialization
-└── tests/                    # Pytest test suite (44 passed)
-    ├── __init__.py
-    ├── conftest.py           # Shared test fixtures & autouse token isolation
-    ├── test_config.py        # Configuration and environment override tests
-    ├── test_document_loader.py# File validation, URL detection, parser tests
-    ├── test_exceptions.py    # Custom exception hierarchy verification
-    └── test_text_processor.py# Chunk boundary and splitting tests
-```
-
----
-
-## 🚀 Quickstart
-
-### 1. Clone & Setup Environment
+## Quick start
 
 ```bash
 git clone https://github.com/CharanBantumilli/RAGBot.git
 cd RAGBot
-
-# Create and activate virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev]"
 ```
 
-### 2. Install Dependencies
+On Windows, activate the environment with:
 
-```bash
-# Install core dependencies
-pip install -r requirements.txt
-
-# Or install in editable mode with development tools:
-pip install -e ".[dev]"
+```powershell
+.venv\Scripts\Activate.ps1
 ```
 
-### 3. Configure Credentials
-
-Copy the `.env.example` file to `.env`:
+Copy the environment template:
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and set your HuggingFace API Token:
-```env
-HUGGINGFACEHUB_API_TOKEN=hf_your_actual_token_here
+Set your Hugging Face token in `.env`:
+
+```dotenv
+HUGGINGFACEHUB_API_TOKEN=hf_your_token_here
 ```
 
-### 4. Launch Application
+Launch RAGBot:
 
 ```bash
 python -m ragbot
-# or via Makefile
-make run
 ```
-Navigate to `http://127.0.0.1:7860` in your web browser.
 
----
+Open `http://127.0.0.1:7860` in a browser.
 
-## ⚙️ Configuration Parameters
+## Docker
 
-All system configurations can be controlled via environment variables or `.env`:
+```bash
+docker build -t ragbot .
+docker run --rm -p 7860:7860 --env-file .env ragbot
+```
+
+## Configuration
 
 | Variable | Default | Description |
 |---|---|---|
-| `HUGGINGFACEHUB_API_TOKEN` | *None* | HuggingFace authentication token (required) |
-| `RAGBOT_EMBEDDING_MODEL_NAME` | `intfloat/multilingual-e5-small` | Hugging Face embedding model |
-| `RAGBOT_LLM_MODEL_NAME` | `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B` | Generator causal language model |
-| `RAGBOT_CHUNK_SIZE` | `500` | Target characters per text chunk |
-| `RAGBOT_CHUNK_OVERLAP` | `50` | Overlap character count between consecutive chunks |
-| `RAGBOT_MAX_NEW_TOKENS` | `200` | Maximum new tokens generated per question |
-| `RAGBOT_TEMPERATURE` | `0.5` | Sampling temperature for LLM inference |
-| `RAGBOT_DEVICE_MAP` | `auto` | Torch device placement (`cuda`, `mps`, `cpu`, or `auto`) |
-| `RAGBOT_CHROMA_PERSIST_DIRECTORY` | `None` | Directory path for persistent vector disk caching |
+| `HUGGINGFACEHUB_API_TOKEN` | — | Hugging Face API token |
+| `RAGBOT_HF_TOKEN` | — | Alternative Hugging Face token variable |
+| `RAGBOT_EMBEDDING_MODEL_NAME` | `intfloat/multilingual-e5-small` | Sentence embedding model |
+| `RAGBOT_LLM_MODEL_NAME` | `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B` | Text generation model |
+| `RAGBOT_CHUNK_SIZE` | `500` | Maximum characters in each chunk |
+| `RAGBOT_CHUNK_OVERLAP` | `50` | Characters reused between adjacent chunks |
+| `RAGBOT_MAX_NEW_TOKENS` | `200` | Maximum response length |
+| `RAGBOT_TEMPERATURE` | `0.5` | Generation sampling temperature |
+| `RAGBOT_DEVICE_MAP` | `auto` | PyTorch device placement |
+| `RAGBOT_CHROMA_PERSIST_DIRECTORY` | — | Optional ChromaDB persistence directory |
 
----
-
-## 🧪 Testing & Code Quality
-
-The project enforces code quality standards using `pytest`, `ruff`, and `mypy`.
+## Development
 
 ```bash
-# Run unit & integration test suite
 make test
-# or: pytest tests/ -v
-
-# Run fast lint checks
 make lint
-
-# Automatically format code
 make format
 ```
 
-All 44 automated tests pass with 0 regressions.
+Run a direct test command:
 
----
+```bash
+pytest tests -v --tb=short
+```
 
-## 💼 Resume Bullet Points
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development and pull-request guidance.
 
-If you are showcasing this project on your resume or portfolio:
+## Limitations
 
-- **Architected and implemented an end-to-end Retrieval-Augmented Generation (RAG) platform** using Python, LangChain, ChromaDB, and Hugging Face transformers, enabling sub-second grounded question-answering over heterogeneous enterprise documents (PDF, TXT, CSV, DOCX, Web).
-- **Engineered an anti-hallucination inference pipeline** utilizing distilled reasoning models (`DeepSeek R1 Distill Qwen 1.5B`) and dense multilingual embeddings (`multilingual-e5-small`), caching vector indexes to eliminate redundant chunking.
-- **Implemented lazy-loading design patterns** for large transformer checkpoints and embedding weights, cutting application cold-start memory footprint by 85%.
-- **Constructed a robust test and CI foundation** with 44 unit and integration tests in `pytest`, achieving complete branch coverage across parsing, chunking, and validation layers.
+- Model downloads require network access and may use substantial disk and memory.
+- Answers depend on retrieval quality and the ingested document's content.
+- The Gradio interface is intended for local or controlled deployments; add authentication and network controls before exposing it publicly.
+- Large documents can significantly increase ingestion time and memory use.
 
----
+## Security
 
-## 🗺️ Roadmap
+Keep API tokens out of source code and never upload private documents to untrusted deployments. See [SECURITY.md](SECURITY.md) for vulnerability reporting guidance.
 
-- [ ] **Multi-Document Ingestion:** Enable simultaneous multi-file cross-referencing.
-- [ ] **Conversational Memory:** Add sliding window buffer memory for multi-turn chat threads.
-- [ ] **Streaming Token Generation:** Implement Server-Sent Events (SSE) for real-time text streaming.
-- [ ] **Containerization:** Production Dockerfile and multi-stage container deployment.
-- [ ] **REST API Interface:** FastAPI endpoints alongside Gradio UI.
+## License
 
----
-
-## 📄 License
-
-Distributed under the MIT License. See [`LICENSE`](LICENSE) for full details.
-
----
-
-<p align="center">
-  <b>Built with precision by Charan Bantumilli</b>
-</p>
+Released under the [MIT License](LICENSE).
